@@ -1,4 +1,4 @@
-import { User, Briefcase, GraduationCap, Award, Mail, Github, Globe } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Award, Mail, GitHub, Globe } from 'lucide-react';
 
 // 데모용 데이터
 const mockUser = {
@@ -45,7 +45,7 @@ export default function ResumePage() {
                 <Mail size={16} className="text-mint" /> {mockUser.email}
               </span>
               <span className="flex items-center gap-2 text-sm text-foreground/70 glass px-3 py-1.5 rounded-full">
-                <Github size={16} className="text-mint" /> {mockUser.github}
+                <GitHub size={16} className="text-mint" /> {mockUser.github}
               </span>
               <span className="flex items-center gap-2 text-sm text-foreground/70 glass px-3 py-1.5 rounded-full">
                 <Globe size={16} className="text-mint" /> {mockUser.website}
