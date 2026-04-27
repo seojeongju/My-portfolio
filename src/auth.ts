@@ -33,8 +33,8 @@ function createNextAuth() {
     adapter,
     providers: [
       Google({
-        clientId: env.AUTH_GOOGLE_ID || process.env.AUTH_GOOGLE_ID,
-        clientSecret: env.AUTH_GOOGLE_SECRET || process.env.AUTH_GOOGLE_SECRET,
+        clientId: env?.AUTH_GOOGLE_ID || process.env.AUTH_GOOGLE_ID,
+        clientSecret: env?.AUTH_GOOGLE_SECRET || process.env.AUTH_GOOGLE_SECRET,
       }),
     ],
     // adapter가 있을 때는 database 전략, 없을 때는 jwt 전략으로 fallback
@@ -44,16 +44,17 @@ function createNextAuth() {
     callbacks: {
       async session({ session, user, token }) {
         if (session.user) {
-          // database 전략: user 객체 사용
-          // jwt 전략: token 객체 사용
+          // JWT fallback의 경우 token에서 id를 가져옵니다.
           const id = user?.id ?? (token?.sub as string);
           if (id) {
             session.user.id = id;
-            // username 조회 (adapter가 있을 때만 의미 있음)
-            if (adapter && user) {
+            
+            // 데이터베이스 어댑터를 사용하는 경우 (Cloudflare D1)
+            // JWT 전략일지라도 필요시 D1에서 추가 정보를 가져올 수 있습니다.
+            if (!adapter) {
               try {
-                const { env } = getRequestContext();
-                const db = drizzle(env.DB, { schema });
+                const ctx = getRequestContext();
+                const db = drizzle(ctx.env.DB, { schema });
                 const dbUser = await db.query.users.findFirst({
                   where: (u, { eq }) => eq(u.id, id),
                 });
@@ -61,7 +62,7 @@ function createNextAuth() {
                   (session.user as any).username = dbUser.username;
                 }
               } catch (e) {
-                console.error("Session username lookup failed:", e);
+                console.error("Failed to fetch user from DB in session callback", e);
               }
             }
           }
@@ -70,7 +71,7 @@ function createNextAuth() {
       },
     },
     trustHost: true,
-    secret: env.AUTH_SECRET || process.env.AUTH_SECRET,
+    secret: env?.AUTH_SECRET || process.env.AUTH_SECRET,
   });
 }
 
