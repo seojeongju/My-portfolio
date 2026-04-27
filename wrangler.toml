@@ -1,0 +1,13 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "my-portfolio"
+compatibility_date = "2024-04-01"
+pages_build_output_dir = ".next"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-portfolio-db"
+database_id = "PLACEHOLDER_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "my-portfolio-bucket"
