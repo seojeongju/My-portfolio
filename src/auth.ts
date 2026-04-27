@@ -3,9 +3,11 @@ import Google from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { getDb } from "@/lib/db-util";
 import * as schema from "@/db/schema";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const { handlers, auth, signIn, signOut } = NextAuth((req) => {
-  // getDb()는 getRequestContext()를 사용하므로 요청 핸들러 내에서 호출해야 합니다.
+  // Cloudflare 환경에서 env 직접 가져오기
+  const { env } = getRequestContext();
   const db = getDb();
 
   return {
@@ -17,8 +19,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth((req) => {
     }),
     providers: [
       Google({
-        clientId: process.env.AUTH_GOOGLE_ID,
-        clientSecret: process.env.AUTH_GOOGLE_SECRET,
+        clientId: env.AUTH_GOOGLE_ID,
+        clientSecret: env.AUTH_GOOGLE_SECRET,
       }),
     ],
     callbacks: {
@@ -38,5 +40,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth((req) => {
     },
     // Edge Runtime 호환을 위한 설정
     trustHost: true,
+    secret: env.AUTH_SECRET,
   };
 });
