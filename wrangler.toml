@@ -6,7 +6,7 @@ pages_build_output_dir = ".next"
 [[d1_databases]]
 binding = "DB"
 database_name = "my-portfolio-db"
-database_id = "PLACEHOLDER_D1_DATABASE_ID"
+database_id = "315bbd68-5e17-49c7-ba51-3f5379b8a4a5"
 
 [[r2_buckets]]
 binding = "BUCKET"
