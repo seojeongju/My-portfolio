@@ -1,16 +1,10 @@
-import { auth } from "@/auth";
+// 미들웨어 일시 비활성화 테스트
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/request';
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const { nextUrl } = req;
-
-  // 대시보드 접근 보호
-  if (nextUrl.pathname.startsWith("/dashboard")) {
-    if (!isLoggedIn) {
-      return Response.redirect(new URL("/api/auth/signin", nextUrl));
-    }
-  }
-});
+export default function middleware(request: NextRequest) {
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
