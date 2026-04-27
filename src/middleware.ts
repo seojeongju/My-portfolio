@@ -1,6 +1,5 @@
 // 미들웨어 일시 비활성화 테스트
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export default function middleware(request: NextRequest) {
   return NextResponse.next();
