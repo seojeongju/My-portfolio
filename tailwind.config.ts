@@ -10,8 +10,9 @@ const config: Config = {
     extend: {
       colors: {
         mint: {
-          DEFAULT: "#00FFCC",
-          dark: "#2ECC71",
+          DEFAULT: "#0D9488", // Teal 600
+          light: "#14B8A6",   // Teal 500
+          dark: "#0F766E",    // Teal 700
         },
         cyber: {
           white: "#F8FAF9",
