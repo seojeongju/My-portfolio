@@ -28,8 +28,7 @@ const mockSkills = [
   { name: "Python", level: "Intermediate" },
 ];
 
-export default function ResumePage({ params }: { params: Promise<{ username: string }> }) {
-  // Next.js 15 대응: params는 비동기로 처리해야 합니다.
+export default function ResumePage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-20">
       {/* 헤더 섹션 */}
