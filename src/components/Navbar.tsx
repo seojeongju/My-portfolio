@@ -42,9 +42,12 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            <Link href="/dashboard" className="p-2 rounded-full hover:bg-mint/10 transition-colors">
+            <Link href="/dashboard" className="p-2 rounded-full hover:bg-mint/10 transition-colors" title="대시보드">
               <Settings size={20} className="text-foreground/70" />
             </Link>
+            <a href="/api/auth/signin" className="px-4 py-2 text-sm font-bold text-white bg-mint rounded-lg hover:bg-mint-dark transition-colors">
+              로그인
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,6 +73,12 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
+          <a
+            href="/api/auth/signin"
+            className="flex items-center gap-3 px-3 py-4 text-base font-bold text-mint hover:bg-mint/10 rounded-lg"
+          >
+            로그인
+          </a>
         </div>
       )}
     </nav>
