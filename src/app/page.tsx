@@ -24,7 +24,7 @@ export default function Home() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4">
-          <a href="/api/auth/signin" className="flex items-center justify-center gap-2 px-8 py-4 bg-mint text-white font-bold rounded-xl hover:bg-mint-dark transition-all transform hover:scale-105 cyber-border">
+          <a href="/auth/signin" className="flex items-center justify-center gap-2 px-8 py-4 bg-mint text-white font-bold rounded-xl hover:bg-mint-dark transition-all transform hover:scale-105 cyber-border">
             지금 시작하기 <ArrowRight size={20} />
           </a>
           <Link href="/@demo" className="flex items-center justify-center gap-2 px-8 py-4 glass text-foreground font-bold rounded-xl hover:bg-slate-100 transition-all border border-slate-200">

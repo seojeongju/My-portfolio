@@ -55,7 +55,7 @@ export default function Navbar({ session }: { session: any }) {
                 </a>
               </div>
             ) : (
-              <a href="/api/auth/signin" className="px-4 py-2 text-sm font-bold text-white bg-mint rounded-lg hover:bg-mint-dark transition-colors">
+              <a href="/auth/signin" className="px-4 py-2 text-sm font-bold text-white bg-mint rounded-lg hover:bg-mint-dark transition-colors">
                 로그인
               </a>
             )}
@@ -96,7 +96,7 @@ export default function Navbar({ session }: { session: any }) {
             </div>
           ) : (
             <a
-              href="/api/auth/signin"
+              href="/auth/signin"
               className="flex items-center gap-3 px-3 py-4 text-base font-bold text-mint hover:bg-mint/10 rounded-lg"
             >
               로그인

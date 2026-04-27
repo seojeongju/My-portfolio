@@ -69,6 +69,8 @@ function createNextAuth() {
         }
         return session;
       },
+    pages: {
+      signIn: '/auth/signin',
     },
     trustHost: true,
     secret: env?.AUTH_SECRET || process.env.AUTH_SECRET,
