@@ -12,9 +12,11 @@ import * as schema from "@/db/schema";
 
 function createNextAuth() {
   // 요청 컨텍스트에서 D1 바인딩을 가져와 DrizzleAdapter를 초기화합니다.
+  let env: any = {};
   let adapter;
   try {
-    const { env } = getRequestContext();
+    const ctx = getRequestContext();
+    env = ctx.env;
     const db = drizzle(env.DB, { schema });
     adapter = DrizzleAdapter(db, {
       usersTable: schema.users,
@@ -31,8 +33,8 @@ function createNextAuth() {
     adapter,
     providers: [
       Google({
-        clientId: process.env.AUTH_GOOGLE_ID,
-        clientSecret: process.env.AUTH_GOOGLE_SECRET,
+        clientId: env.AUTH_GOOGLE_ID || process.env.AUTH_GOOGLE_ID,
+        clientSecret: env.AUTH_GOOGLE_SECRET || process.env.AUTH_GOOGLE_SECRET,
       }),
     ],
     // adapter가 있을 때는 database 전략, 없을 때는 jwt 전략으로 fallback
@@ -68,7 +70,7 @@ function createNextAuth() {
       },
     },
     trustHost: true,
-    secret: process.env.AUTH_SECRET,
+    secret: env.AUTH_SECRET || process.env.AUTH_SECRET,
   });
 }
 
