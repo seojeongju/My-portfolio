@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import Link from 'next/link';
 import { LayoutDashboard, FileText, Briefcase, Settings, UserCircle, LogOut } from 'lucide-react';
 
