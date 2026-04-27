@@ -69,6 +69,7 @@ function createNextAuth() {
         }
         return session;
       },
+    },
     pages: {
       signIn: '/auth/signin',
     },
