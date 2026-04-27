@@ -1,6 +1,8 @@
 import { getRequestContext } from '@cloudflare/next-on-pages';
 import { NextRequest } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ key: string[] }> } // Promise 타입으로 수정

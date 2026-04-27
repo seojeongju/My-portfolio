@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { User, Briefcase, GraduationCap, Award, Mail, Globe } from 'lucide-react';
 
 // 데모용 데이터
