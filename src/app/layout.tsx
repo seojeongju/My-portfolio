@@ -7,15 +7,19 @@ export const metadata: Metadata = {
   description: "하드웨어, 소프트웨어, 디자인을 아우르는 나만의 포트폴리오 및 이력서 플랫폼",
 };
 
-export default function RootLayout({
+import { auth } from "@/auth";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="ko">
       <body>
-        <Navbar />
+        <Navbar session={session} />
         <main className="pt-20 min-h-screen">
           {children}
         </main>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Home, Briefcase, User, Settings, Menu } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Navbar() {
+export default function Navbar({ session }: { session: any }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -14,6 +14,8 @@ export default function Navbar() {
     { name: '포트폴리오', href: '/portfolio', icon: <Briefcase size={20} /> },
     { name: '이력서', href: '/resume', icon: <User size={20} /> },
   ];
+
+  const user = session?.user;
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 glass border-b border-white/20">
@@ -45,9 +47,18 @@ export default function Navbar() {
             <Link href="/dashboard" className="p-2 rounded-full hover:bg-mint/10 transition-colors" title="대시보드">
               <Settings size={20} className="text-foreground/70" />
             </Link>
-            <a href="/api/auth/signin" className="px-4 py-2 text-sm font-bold text-white bg-mint rounded-lg hover:bg-mint-dark transition-colors">
-              로그인
-            </a>
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm font-medium text-foreground/70">{user.name}님</span>
+                <a href="/api/auth/signout" className="px-4 py-2 text-sm font-bold text-foreground/70 border border-foreground/20 rounded-lg hover:bg-foreground/5 transition-colors">
+                  로그아웃
+                </a>
+              </div>
+            ) : (
+              <a href="/api/auth/signin" className="px-4 py-2 text-sm font-bold text-white bg-mint rounded-lg hover:bg-mint-dark transition-colors">
+                로그인
+              </a>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -73,12 +84,24 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
-          <a
-            href="/api/auth/signin"
-            className="flex items-center gap-3 px-3 py-4 text-base font-bold text-mint hover:bg-mint/10 rounded-lg"
-          >
-            로그인
-          </a>
+          {user ? (
+            <div className="flex flex-col gap-2 p-3">
+              <span className="text-sm font-medium text-foreground/70 px-3">{user.name}님 반가워요!</span>
+              <a
+                href="/api/auth/signout"
+                className="flex items-center gap-3 px-3 py-4 text-base font-bold text-foreground/70 hover:bg-foreground/5 rounded-lg"
+              >
+                로그아웃
+              </a>
+            </div>
+          ) : (
+            <a
+              href="/api/auth/signin"
+              className="flex items-center gap-3 px-3 py-4 text-base font-bold text-mint hover:bg-mint/10 rounded-lg"
+            >
+              로그인
+            </a>
+          )}
         </div>
       )}
     </nav>
