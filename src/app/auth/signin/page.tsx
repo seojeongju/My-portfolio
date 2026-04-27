@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { signIn } from "next-auth/react";
 import { Chrome } from "lucide-react";
 import { motion } from "framer-motion";

@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import Link from 'next/link';
 import { ArrowRight, Cpu, Code, Palette } from 'lucide-react';
 

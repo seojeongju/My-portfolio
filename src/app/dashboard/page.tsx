@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Eye, Briefcase, FileText, Share2, PlusCircle } from 'lucide-react';
 import Link from 'next/link';
 

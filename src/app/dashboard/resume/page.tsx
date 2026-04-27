@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useState } from 'react';
 import { Plus, Trash2, Edit2, Briefcase, GraduationCap, Award, Save } from 'lucide-react';
 
