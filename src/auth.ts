@@ -1,53 +1,104 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { getRequestContext } from "@cloudflare/next-on-pages";
+import { drizzle } from "drizzle-orm/d1";
+import * as schema from "@/db/schema";
 
-// ⚠️ Edge Runtime 제약사항:
-// DrizzleAdapter는 모듈 초기화 시점에 getRequestContext()를 호출하므로
-// Cloudflare Pages에서 500 에러를 유발합니다.
-// 따라서 adapter 없이 JWT 기반 세션으로 운영하고,
-// DB 연동은 세션 콜백에서 요청 컨텍스트가 확보된 이후에 수행합니다.
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
-  ],
-  session: {
-    // adapter 없이는 JWT 전략 사용
-    strategy: "jwt",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      // 최초 로그인 시 user 정보를 token에 포함
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
+// ✅ Edge Runtime 핵심 패턴:
+// NextAuth()를 함수 내부에서 지연 초기화하여,
+// getRequestContext()가 반드시 요청 처리 중에만 호출되도록 합니다.
+// 모듈 로드 시점에 호출하면 Cloudflare 컨텍스트가 없어 500 에러가 발생합니다.
+
+function createNextAuth() {
+  // 요청 컨텍스트에서 D1 바인딩을 가져와 DrizzleAdapter를 초기화합니다.
+  let adapter;
+  try {
+    const { env } = getRequestContext();
+    const db = drizzle(env.DB, { schema });
+    adapter = DrizzleAdapter(db, {
+      usersTable: schema.users,
+      accountsTable: schema.accounts,
+      sessionsTable: schema.sessions,
+      verificationTokensTable: schema.verificationTokens,
+    });
+  } catch {
+    // 로컬 개발 환경이나 빌드 시점에는 adapter 없이 진행
+    adapter = undefined;
+  }
+
+  return NextAuth({
+    adapter,
+    providers: [
+      Google({
+        clientId: process.env.AUTH_GOOGLE_ID,
+        clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      }),
+    ],
+    // adapter가 있을 때는 database 전략, 없을 때는 jwt 전략으로 fallback
+    session: {
+      strategy: adapter ? "database" : "jwt",
     },
-    async session({ session, token }) {
-      // JWT 전략에서는 token을 통해 user id를 전달
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
-
-        // DB에서 username 조회 (요청 컨텍스트가 확보된 이후)
-        try {
-          const { getDb } = await import("@/lib/db-util");
-          const db = getDb();
-          const dbUser = await db.query.users.findFirst({
-            where: (users: any, { eq }: any) => eq(users.id, token.id),
-          });
-          if (dbUser?.username) {
-            (session.user as any).username = dbUser.username;
+    callbacks: {
+      async session({ session, user, token }) {
+        if (session.user) {
+          // database 전략: user 객체 사용
+          // jwt 전략: token 객체 사용
+          const id = user?.id ?? (token?.sub as string);
+          if (id) {
+            session.user.id = id;
+            // username 조회 (adapter가 있을 때만 의미 있음)
+            if (adapter && user) {
+              try {
+                const { env } = getRequestContext();
+                const db = drizzle(env.DB, { schema });
+                const dbUser = await db.query.users.findFirst({
+                  where: (u, { eq }) => eq(u.id, id),
+                });
+                if (dbUser?.username) {
+                  (session.user as any).username = dbUser.username;
+                }
+              } catch (e) {
+                console.error("Session username lookup failed:", e);
+              }
+            }
           }
-        } catch (e) {
-          // DB 바인딩이 없는 환경(로컬 개발)에서는 조용히 무시
-          console.error("Session DB lookup failed:", e);
         }
-      }
-      return session;
+        return session;
+      },
     },
-  },
-  trustHost: true,
-  secret: process.env.AUTH_SECRET,
-});
+    trustHost: true,
+    secret: process.env.AUTH_SECRET,
+  });
+}
+
+// NextAuth 인스턴스를 싱글턴으로 캐싱합니다.
+// Cloudflare Worker isolate 내에서는 재사용 가능합니다.
+let _instance: ReturnType<typeof NextAuth> | null = null;
+
+function getInstance() {
+  if (!_instance) {
+    _instance = createNextAuth();
+  }
+  return _instance;
+}
+
+// handlers, auth, signIn, signOut를 Proxy로 노출하여
+// 실제 호출 시점에 인스턴스가 초기화되도록 합니다.
+export const handlers = new Proxy(
+  {} as ReturnType<typeof NextAuth>["handlers"],
+  {
+    get(_t, prop) {
+      return getInstance().handlers[prop as keyof ReturnType<typeof NextAuth>["handlers"]];
+    },
+  }
+);
+
+export const auth = ((...args: Parameters<ReturnType<typeof NextAuth>["auth"]>) =>
+  getInstance().auth(...args)) as ReturnType<typeof NextAuth>["auth"];
+
+export const signIn = ((...args: Parameters<ReturnType<typeof NextAuth>["signIn"]>) =>
+  getInstance().signIn(...args)) as ReturnType<typeof NextAuth>["signIn"];
+
+export const signOut = ((...args: Parameters<ReturnType<typeof NextAuth>["signOut"]>) =>
+  getInstance().signOut(...args)) as ReturnType<typeof NextAuth>["signOut"];
