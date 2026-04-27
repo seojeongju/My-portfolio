@@ -5,7 +5,12 @@ export const runtime = "edge";
 export const GET = async (...args: any[]) => {
   try {
     const handler = (handlers as any).GET;
-    return await handler(...args);
+    const response = await handler(...args);
+    if (response && response.status === 500) {
+      const text = await response.text();
+      return new Response(JSON.stringify({ error: "NextAuth returned 500", text }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    return response;
   } catch (e: any) {
     console.error("Auth GET Error:", e);
     // Cloudflare Pages가 500 에러를 가로채는 것을 막기 위해 200으로 반환하여 에러 메시지를 확인합니다.
