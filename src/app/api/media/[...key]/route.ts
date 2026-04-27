@@ -5,11 +5,12 @@ export const runtime = 'edge';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { key: string[] } }
+  { params }: { params: Promise<{ key: string[] }> } // Promise 타입으로 수정
 ) {
   try {
     const { env } = getRequestContext();
-    const key = params.key.join('/');
+    const resolvedParams = await params; // params를 기다림(await)
+    const key = resolvedParams.key.join('/');
     
     // R2에서 파일 가져오기
     const object = await env.BUCKET.get(key);

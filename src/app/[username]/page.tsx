@@ -22,7 +22,8 @@ const categories = [
   { id: 3, name: "디자인", icon: <Palette size={18} /> },
 ];
 
-export default function UserPortfolioPage() {
+export default function UserPortfolioPage({ params }: { params: Promise<{ username: string }> }) {
+  // Next.js 15에서는 params를 await 해야 합니다. (현재는 mock 데이터 사용 중이라 선언만 해둡니다)
   const [selectedCategory, setSelectedCategory] = useState(0);
 
   const filteredPortfolios = selectedCategory === 0 
