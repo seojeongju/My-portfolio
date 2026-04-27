@@ -27,7 +27,7 @@ export default function Home() {
           <Link href="/signup" className="flex items-center justify-center gap-2 px-8 py-4 bg-mint text-black font-bold rounded-xl hover:bg-mint/80 transition-all transform hover:scale-105 cyber-border">
             지금 시작하기 <ArrowRight size={20} />
           </Link>
-          <Link href="/@demo" className="flex items-center justify-center gap-2 px-8 py-4 glass text-foreground font-bold rounded-xl hover:bg-white/50 transition-all border border-white/20">
+          <Link href="/@demo" className="flex items-center justify-center gap-2 px-8 py-4 glass text-foreground font-bold rounded-xl hover:bg-white/10 transition-all border border-white/20">
             데모 보기
           </Link>
         </div>
